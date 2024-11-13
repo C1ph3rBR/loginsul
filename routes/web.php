@@ -18,6 +18,9 @@ Route::put('usuarios/{id}', [UsuarioController::class, 'update']);
 Route::delete('usuarios/{id}', [UsuarioController::class, 'destroy']);
 
 Route::get('check-matricula-senha', [UsuarioController::class, 'checkMatriculaAndPassword']);
+//Route::get('/acessar/{sistema}', [UsuarioController::class, 'acessarSistema']);
+
+Route::get('/acessar', [UsuarioController::class, 'acessarSistema']);
 
 
 

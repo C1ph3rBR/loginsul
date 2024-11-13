@@ -5,6 +5,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Usuario;
+use App\Models\Permissao;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,8 +19,7 @@ class UsuarioController extends Controller
     }
 
     // Criar um novo usuário
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'password' => 'required|string|min:8',
@@ -44,8 +44,7 @@ class UsuarioController extends Controller
     }
 
     // Mostrar um usuário específico
-    public function show($id)
-    {
+    public function show($id){
         $usuario = Usuario::find($id);
 
         if (!$usuario) {
@@ -56,8 +55,7 @@ class UsuarioController extends Controller
     }
 
     // Atualizar um usuário
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id){
         $usuario = Usuario::find($id);
 
         if (!$usuario) {
@@ -88,8 +86,7 @@ class UsuarioController extends Controller
     }
 
     // Deletar um usuário
-    public function destroy($id)
-    {
+    public function destroy($id){
         $usuario = Usuario::find($id);
 
         if (!$usuario) {
@@ -101,8 +98,7 @@ class UsuarioController extends Controller
         return response()->json(['message' => 'Usuário deletado com sucesso']);
     }
 
-    public function checkMatriculaAndPassword(Request $request)
-    {
+    public function checkMatriculaAndPassword(Request $request){
         // Valida os dados da requisição
         $validated = $request->validate([
             'matricula' => 'required|string',
@@ -123,6 +119,48 @@ class UsuarioController extends Controller
 
         return response()->json(['message' => 'Matrícula e senha corretas'], 200);
     }
+
+    public function temPermissao($usuario, $sistema){
+        // Verifica se a permissão existe para o usuário no sistema
+        $permissao = Permissao::where('usuario', $usuario)
+                              ->where('sistema', $sistema)
+                              ->first();
+
+        // Se não encontrar a permissão ou se a permissão for 0 (sem permissão)
+        if (!$permissao || !$permissao->tem_permissao) {
+            return false;  // Não tem permissão
+        }
+
+        return true;  // Tem permissão
+    }
+
+    public function acessarSistema(Request $request){
+        // Validação dos dados enviados na requisição
+        $validated = $request->validate([
+            'matricula' => 'required|string',
+            'sistema' => 'required|string',
+        ]);
+
+        // Verifica se o usuário existe para o sistema solicitado
+        $permissao = Permissao::where('usuario', $validated['matricula'])
+                              ->where('sistema', $validated['sistema'])
+                              ->first();
+
+        // Se o usuário não foi encontrado
+        if (!$permissao) {
+            return response()->json(['message' => 'Usuário não encontrado ou não tem permissão para o sistema ' . $validated['sistema']], 404);
+        }
+
+        // Se o usuário não tem permissão para o sistema
+        if (!$permissao->tem_permissao) {
+            return response()->json(['message' => 'Acesso negado ao sistema ' . $validated['sistema']], 403);
+        }
+
+        // Se o usuário tem permissão
+        return response()->json(['message' => 'Acesso permitido ao sistema ' . $validated['sistema']], 200);
+    }
+
+
 
 
 }
