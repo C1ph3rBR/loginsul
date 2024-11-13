@@ -23,3 +23,24 @@ VALUES
 ('Carla Souza', 'senhaFortissima789', NOW(), NOW(), '321.654.987-00', 1, 3, 1, 'MTR12347'),
 ('Daniel Rocha', '123senhaSegura', NOW(), NOW(), '654.321.987-00', 1, 1, 2, 'MTR12348'),
 ('Eduardo Lima', 'senhaForte321', NOW(), NOW(), '567.123.456-78', 0, 2, 2, 'MTR12349');
+
+
+
+-- Criar a tabela permissoes (caso não exista)
+CREATE TABLE IF NOT EXISTS permissoes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    sistema NVARCHAR(255) NOT NULL,
+    usuario NVARCHAR(255) NOT NULL,
+    tem_permissao BIT NOT NULL,
+    data_alteracao DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Inserir dados na tabela permissoes
+INSERT INTO permissoes (sistema, usuario, tem_permissao, data_alteracao)
+VALUES 
+('Sistema A', 'MTR12345', 0, NOW()),
+('Sistema B', 'MTR12346', 1, NOW()),
+('Sistema A', 'MTR12347', 0, NOW()),
+('Sistema B', 'MTR12348', 1, NOW()),
+('Sistema A', 'MTR12349', 0, NOW());
+
